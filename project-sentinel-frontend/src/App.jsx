@@ -9,6 +9,7 @@ import RedactedLogsModal from "./components/RedactedLogsModal";
 import StockChartContainer from "./components/StockChartContainer";
 import { fetchIntelByLocation, createIntel, adaptBackendIntelRow } from "./api/intel";
 import { buildChartData, DUMMY_INTEL, DUMMY_LEVELS, LOCATIONS, RESOURCES } from "./dummyData";
+import { fetchZeroStocks } from "./api/levels"
 
 function GlassCard({ title, right, children, className = "" }) {
   return (
@@ -132,31 +133,80 @@ export default function App() {
 
 
 
+  const [zeroRowsAll, setZeroRowsAll] = useState([]);
+  const [zeroLoading, setZeroLoading] = useState(true);
+  const [zeroError, setZeroError] = useState(null);
 
-  // Chart data: one line per resource, filtered by location, range
-  // const chartData = useMemo(() => buildChartData(DUMMY_LEVELS, location, range), [location, range]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setZeroLoading(true);
+    setZeroError(null);
+
+    fetchZeroStocks()
+      .then((rows) => {
+        if (!cancelled) setZeroRowsAll(rows);
+      })
+      .catch((e) => {
+        if (!cancelled) setZeroError(e.message || "Failed to fetch zero-stock rows");
+      })
+      .finally(() => {
+
+        if (!cancelled) setZeroLoading(false);
+              });
+
+            return () => {
+              cancelled = true;
+            };
+          }, []); // fetch once; server already returns latest zeroes
+
   
-
-  // Summary table: “out” = latest stock == 0
+// Filter by user-selected location and adapt to SummaryOutTable shape
   const outRows = useMemo(() => {
-    // compute latest by resource for selected location
-    const latestByResource = new Map();
-    for (const row of DUMMY_LEVELS.filter((r) => r.location === location)) {
-      const key = row.resource;
-      const prev = latestByResource.get(key);
-      if (!prev || new Date(row.timestamp) > new Date(prev.timestamp)) {
-        latestByResource.set(key, row);
-      }
-    }
-    return Array.from(latestByResource.values())
-      .filter((r) => r.level <= 0)
+    const filtered = zeroRowsAll.filter((r) => r.location === location);
+    // SummaryOutTable expects: { location, resource, timestamp }
+    return filtered
       .map((r) => ({
         location: r.location,
         resource: r.resource,
         timestamp: r.timestamp,
       }))
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  }, [location]);
+  }, [zeroRowsAll, location]);
+
+
+
+  // Chart data: one line per resource, filtered by location, range
+  // const chartData = useMemo(() => buildChartData(DUMMY_LEVELS, location, range), [location, range]);
+  
+
+  // Summary table: “out” = latest stock == 0
+  // const outRows = useMemo(() => {
+  //   // compute latest by resource for selected location
+  //   const latestByResource = new Map();
+  //   for (const row of DUMMY_LEVELS.filter((r) => r.location === location)) {
+  //     const key = row.resource;
+  //     const prev = latestByResource.get(key);
+  //     if (!prev || new Date(row.timestamp) > new Date(prev.timestamp)) {
+  //       latestByResource.set(key, row);
+  //     }
+  //   }
+  //   return Array.from(latestByResource.values())
+  //     .filter((r) => r.level <= 0)
+  //     .map((r) => ({
+  //       location: r.location,
+  //       resource: r.resource,
+  //       timestamp: r.timestamp,
+  //     }))
+  //     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  // }, [location]);
+
+  // const outRows = fetchZeroStocks()
+
+ 
+
+
+
 
   return (
     <div className="min-h-full">

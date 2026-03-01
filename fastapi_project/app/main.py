@@ -11,6 +11,7 @@ from app.routers.Log import router as Log_router
 from app.routers.HistoricStockLevels import router as HistoricStockLevels_router
 from app.routers.Form import router as Form_router
 from app.routers.ML_Model import router as ML_Model_router
+from app.routers.zeroes import router as zeroes_router
 
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -45,6 +46,7 @@ app.include_router(Log_router)
 app.include_router(HistoricStockLevels_router)
 app.include_router(Form_router)
 app.include_router(ML_Model_router)
+app.include_router(zeroes_router)
 
 # @app.get("/")
 # def read_root():

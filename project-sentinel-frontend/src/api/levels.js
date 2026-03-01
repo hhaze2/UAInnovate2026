@@ -77,3 +77,28 @@ let value = null;
   return num; // <— ALWAYS a number
   }
 //   return num;
+
+// function adaptZeroesToSummaryTable(r) {
+//   return {
+//     location: r.location,
+//     resource: r.resource_type,                 // <-- map backend -> frontend
+//     timestamp: new Date(r.timestamp).toISOString(),
+//     level: Number(r.stock_level),
+//   };
+// }
+
+
+export async function fetchZeroStocks() {
+    const res = await fetch(`${API_BASE}/getZeroes`);
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+
+    const json = await res.json();
+
+    // If backend wraps the list, unwrap it here.
+    const list =
+        Array.isArray(json)
+        ? json
+        : (json?.data ?? json?.items ?? json?.results ?? []);
+
+    return list.map(adaptBackendRow);
+}
