@@ -19,6 +19,6 @@ def create_HistoricStockLevels(HistoricStockLevels: HistoricStockLevels, session
 def list_HistoricStockLevels(session: Session = Depends(get_session)):
     return session.exec(select(HistoricStockLevels)).all()
 
-@router.get("/", response_model=list[HistoricStockLevels])
-def list_HistoricStockLevels(session: Session = Depends(get_session)):
-    return session.exec(select(HistoricStockLevels)).all()
+# @router.get("/", response_model=list[HistoricStockLevels])
+# def list_HistoricStockLevels(session: Session = Depends(get_session)):
+#     return session.exec(select(HistoricStockLevels)).all()
