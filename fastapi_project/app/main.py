@@ -7,6 +7,8 @@ from app.services.database.models import configure
 
 
 from app.routers.LiveIntelligenceReports import router as LiveIntelligenceReports_router
+from app.routers.Log import router as Log_router
+from app.routers.HistoricStockLevels import router as HistoricStockLevels_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -22,6 +24,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(LiveIntelligenceReports_router)
+app.include_router(Log_router)
+app.include_router(HistoricStockLevels_router)
 
 # @app.get("/")
 # def read_root():
