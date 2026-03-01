@@ -53,6 +53,8 @@ EXTRACTION_SCHEMA: Dict[str, Any] = {
 
 def get_LLM_data(redacted_text: str) -> Dict[str, Any]:
 
+    print(f'Inside LLM_Handler, using {redacted_text}')
+
     system_instructions = (
         "You are an information extraction engine. "
         "Extract the requested fields from the input text. "
@@ -63,6 +65,7 @@ def get_LLM_data(redacted_text: str) -> Dict[str, Any]:
     )
 
     try:
+        print("Calling LLM...")
         response = client.responses.create(
             model="gpt-4.1-mini",
             input=[
@@ -79,7 +82,10 @@ def get_LLM_data(redacted_text: str) -> Dict[str, Any]:
             },
         )
 
+        print(response)
+
         data = json.loads(response.output_text)
+        print("LLM Success")
         return data
 
     except Exception as e:
