@@ -1,6 +1,7 @@
 # UAInnovate2026
 
 
+## Backend
 To set up .venv: 
 
 cd fastapi_project
@@ -24,3 +25,11 @@ python -m scripts.import_historic_stock_data --file data/filename.csv
 Note that the docker environment must be running before you do this. To do that, you run the command: 
 
 docker compose up -d
+
+
+# Frontend
+cd project-sentinel-frontend
+run npm install to install dependencies
+run npm run dev to run the frontend
+
+The frontend is locally hosted at: http://localhost:5173/
