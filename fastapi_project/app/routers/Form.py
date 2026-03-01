@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, status, HTTPException, Form
+from fastapi import APIRouter, Depends, status, HTTPException, Body
 from sqlmodel import Session, select
 from app.services.database.session import get_session
 from app.services.database.models import LiveIntelligenceReports, Log
+from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional
 
@@ -17,10 +18,21 @@ import json
 
 router = APIRouter(prefix="/Form", tags=["Form"])
 
+
+class IntelCreate(BaseModel):
+    heroName: str = Field(..., min_length=1)
+    phoneNumber: str | None = None
+    report: str = Field(..., min_length=1)
+    priority: str  # e.g., "Routine" | "High" | "Avengers-Level Threat"
+    timestamp: datetime
+
+
+
 @router.post("/", response_model=dict, status_code=status.HTTP_201_CREATED)
 def handle_form(
     # payload: Optional[dict] = None,
-    payload: str,
+    # payload: str,
+    payload: IntelCreate = Body(...),
     # payload: str = Form(),
     # hero_alias: str,
     # secure_contact: str,
@@ -40,11 +52,16 @@ def handle_form(
     
     # extract data from the json payload
 
-    hero_alias = (json.loads(payload))["heroName"]
-    secure_contact = json.loads(payload)["phoneNumber"]
-    raw_text = json.loads(payload)["report"]
-    priority = json.loads(payload)["priority"]
-    timestamp = json.loads(payload)["timestamp"]
+    # hero_alias = (json.loads(payload))["heroName"]
+    # secure_contact = json.loads(payload)["phoneNumber"]
+    # raw_text = json.loads(payload)["report"]
+    # priority = json.loads(payload)["priority"]
+    # timestamp = json.loads(payload)["timestamp"]
+    hero_alias = payload.heroName
+    secure_contact = payload.phoneNumber
+    raw_text = payload.report
+    priority = payload.priority
+    timestamp = payload.timestamp
 
 
     # hugging face
@@ -79,6 +96,7 @@ def handle_form(
     # returns mock_data for now
     LLM_data = get_LLM_data(redacted_text)
 
+    # FIXME: CHECK IF NONE INSTEAD
     if not("location" in LLM_data):
         LLM_data["location"] = "Unknown"
     elif not(LLM_data["location"] in VALID_LOCATIONS):
@@ -108,4 +126,5 @@ def handle_form(
     create_liveIntelligenceReport(report, session)
 
     # if there's not a success raise some kind of error? idk
-    return {"id": report.id, "status": "created"}
+    # return create_liveIntelligenceReport(report, session)
+    return {"test": "success"}

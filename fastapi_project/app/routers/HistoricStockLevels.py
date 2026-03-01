@@ -22,13 +22,13 @@ def list_HistoricStockLevels(session: Session = Depends(get_session)):
 
 # This request takes a resource type and location and returns all historic data entries relating to that resource/location pairing
 # Use rest like path parameters in the endpoint
-# @router.get("/{location}/{resource_type}", response_model=list[HistoricStockLevels])
-# def list_HistoricStockLevels_filtered(location: str, resource_type: str, session: Session = Depends(get_session)):
-#     return (session.query(HistoricStockLevels).filter(
-#         HistoricStockLevels.location == location,
-#         HistoricStockLevels.resource_type == resource_type
-#     ).all()
-#     )
+@router.get("/{location}/{resource_type}", response_model=list[HistoricStockLevels])
+def list_HistoricStockLevels_location_and_type(location: str, resource_type: str, session: Session = Depends(get_session)):
+    return (session.query(HistoricStockLevels).filter(
+        HistoricStockLevels.location == location,
+        HistoricStockLevels.resource_type == resource_type
+    ).all()
+    )
 @router.get("/{location}", response_model=list[HistoricStockLevels])
 def list_HistoricStockLevels_filtered(location: str, session: Session = Depends(get_session)):
     return (session.query(HistoricStockLevels).filter(

@@ -10,6 +10,12 @@ from app.routers.LiveIntelligenceReports import router as LiveIntelligenceReport
 from app.routers.Log import router as Log_router
 from app.routers.HistoricStockLevels import router as HistoricStockLevels_router
 from app.routers.Form import router as Form_router
+from app.routers.ML_Model import router as ML_Model_router
+
+
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -24,10 +30,21 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Vite dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 app.include_router(LiveIntelligenceReports_router)
 app.include_router(Log_router)
 app.include_router(HistoricStockLevels_router)
 app.include_router(Form_router)
+app.include_router(ML_Model_router)
 
 # @app.get("/")
 # def read_root():

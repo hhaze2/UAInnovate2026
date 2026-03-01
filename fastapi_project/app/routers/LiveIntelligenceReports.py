@@ -18,3 +18,11 @@ def create_liveIntelligenceReport(LiveIntelligenceReports: LiveIntelligenceRepor
 @router.get("/", response_model=list[LiveIntelligenceReports])
 def list_LiveIntelligenceReports(session: Session = Depends(get_session)):
     return session.exec(select(LiveIntelligenceReports)).all()
+
+
+@router.get("/{location}", response_model=list[LiveIntelligenceReports])
+def list_LiveIntelligenceReports_filtered(location: str, session: Session = Depends(get_session)):
+    return (session.query(LiveIntelligenceReports).filter(
+        LiveIntelligenceReports.location == location
+    ).all()
+    )
